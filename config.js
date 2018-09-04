@@ -1,0 +1,6 @@
+module.exports = {
+  METRICS_MOUNT_PATH: process.env.PROM_METRICS_MOUNT_PATH,
+  PUSH_GATEWAY_URL: process.env.PROM_PUSH_GATEWAY_URL,
+  PUSH_JOB_NAME: 'talk',
+  PUSH_FREQUENCY: '5s',
+};
