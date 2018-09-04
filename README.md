@@ -4,13 +4,15 @@ This plugin provides a [Prometheus](https://prometheus.io/) exporter for [Talk](
 
 ## Installation
 
+**Currently in alpha, do not use in production yet!**
+
 Modify/create your plugins.json file to include the plugin:
 
 ```
 {
   "server": [
     // ...
-    {"@coralproject/talk-plugin-prom": "^1.0.0"},
+    {"@coralproject/talk-plugin-prom": "https://github.com/coralproject/talk-plugin-prom#master"},
     // ...
   ],
   "client": [
