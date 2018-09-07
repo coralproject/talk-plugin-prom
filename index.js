@@ -8,7 +8,11 @@ const config = require('./config');
 // Label requests that have already been instrumented.
 const IS_INSTRUMENTED = Symbol('IS_INSTRUMENTED');
 
-if (!config.PUSH_GATEWAY_URL && !config.METRICS_MOUNT_PATH) {
+if (
+  process.env.NODE_ENV !== 'test' &&
+  !config.PUSH_GATEWAY_URL &&
+  !config.METRICS_MOUNT_PATH
+) {
   throw new Error(
     'must specify at least one of PROM_METRICS_MOUNT_PATH PROM_PUSH_GATEWAY_URL'
   );
@@ -36,7 +40,7 @@ function configurePushgateway() {
   }, ms(config.PUSH_FREQUENCY));
 }
 
-if (config.PUSH_GATEWAY_URL) {
+if (process.env.NODE_ENV !== 'test' && config.PUSH_GATEWAY_URL) {
   configurePushgateway();
 }
 
