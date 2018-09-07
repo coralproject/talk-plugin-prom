@@ -12,7 +12,7 @@ Modify/create your plugins.json file to include the plugin:
 {
   "server": [
     // ...
-    {"@coralproject/talk-plugin-prom": "https://github.com/coralproject/talk-plugin-prom#master"},
+    {"@coralproject/talk-plugin-prom": "0.0.1-alpha"},
     // ...
   ],
   "client": [

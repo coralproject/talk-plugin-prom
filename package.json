@@ -1,9 +1,9 @@
 {
   "name": "@coralproject/talk-plugin-prom",
-  "version": "0.0.0",
+  "version": "0.0.1-alpha",
   "main": "index.js",
   "author": "Wyatt Johnson <wyattjoh@gmail.com>",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "dependencies": {
     "ms": "^2.1.1",
     "on-finished": "^2.3.0",
