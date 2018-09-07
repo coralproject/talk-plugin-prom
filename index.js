@@ -1,7 +1,12 @@
 const os = require('os');
 const ms = require('ms');
+const { URL } = require('url');
 const onFinished = require('on-finished');
 const client = require('prom-client');
+const debug = require('debug')('talk-plugin-prom');
+
+// Load the global Talk configuration, we want to grab some variables..
+const { ROOT_URL } = require('config');
 
 const config = require('./config');
 
@@ -22,6 +27,9 @@ function configurePushgateway() {
   // Configure the pushgateway.
   const gateway = new client.Pushgateway(config.PUSH_GATEWAY_URL);
 
+  // Parse the ROOT_URL because we want the hostname.
+  const rootURL = new URL(ROOT_URL);
+
   // Configure pushing to the gateway at a predefined interval.
   setInterval(() => {
     gateway.push(
@@ -29,15 +37,20 @@ function configurePushgateway() {
         jobName: config.PUSH_JOB_NAME,
         groupings: {
           instance: os.hostname(),
+          installation_domain: rootURL.hostname,
         },
       },
-      err => {
+      (err, res, body) => {
         if (err) {
           console.error('error pushing to gateway', err);
+        } else {
+          debug(`pushed metrics ${JSON.stringify(body, null, 2)}`);
         }
       }
     );
   }, ms(config.PUSH_FREQUENCY));
+
+  debug('push gateway configured');
 }
 
 if (process.env.NODE_ENV !== 'test' && config.PUSH_GATEWAY_URL) {
@@ -45,7 +58,7 @@ if (process.env.NODE_ENV !== 'test' && config.PUSH_GATEWAY_URL) {
 }
 
 const connectedWebsocketsTotalGauge = new client.Gauge({
-  name: 'connected_websockets_total',
+  name: 'talk_connected_websockets_total',
   help: 'number of websocket connections currently being handled',
 });
 
@@ -66,20 +79,20 @@ const httpRequestDurationMilliseconds = new client.Histogram({
 });
 
 const executedGraphQueriesTotalCounter = new client.Counter({
-  name: 'executed_graph_queries_total',
+  name: 'talk_executed_graph_queries_total',
   help: 'number of GraphQL queries executed',
   labelNames: ['operation_type', 'operation_name'],
 });
 
 const graphQLExecutionTimingsHistogram = new client.Histogram({
-  name: 'executed_graph_queries_timings',
+  name: 'talk_executed_graph_queries_timings',
   help: 'timings for execution times of GraphQL operations',
   buckets: [0.1, 5, 15, 50, 100, 500],
   labelNames: ['operation_type', 'operation_name'],
 });
 
 // Configure the prom client to send default metrics.
-client.collectDefaultMetrics();
+client.collectDefaultMetrics({ prefix: 'talk_' });
 
 module.exports = {
   websockets: {
