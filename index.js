@@ -4,6 +4,7 @@ const { URL } = require('url');
 const onFinished = require('on-finished');
 const client = require('prom-client');
 const debug = require('debug')('talk-plugin-prom');
+const { get } = require('lodash');
 
 // Load the global Talk configuration, we want to grab some variables..
 const { ROOT_URL } = require('config');
@@ -123,9 +124,8 @@ module.exports = {
     //
 
     // The GraphQL Operation Name. Example: CoralEmbedStream_Embed
-    const name =
-      info.operation.name !== null ? info.operation.name.value : null;
-    const operation = info.operation.operation;
+    const name = get(info, 'operation.name.value', null);
+    const operation = get(info, 'operation.operation', null);
 
     // Attach the GraphQL Operation Name to the parent context, in this case,
     // the request object.
@@ -176,7 +176,10 @@ module.exports = {
 
         // Extract the graph details that we added to the parent context from
         // the request object.
-        const { name, operation } = req.graphql;
+        const { name, operation } = get(req, 'graphql', {
+          name: null,
+          operation: null,
+        });
 
         // Increment the graph query value, tagging with the name of the query.
         executedGraphQueriesTotalCounter.labels(operation, name).inc();
