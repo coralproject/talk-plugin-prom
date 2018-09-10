@@ -25,7 +25,9 @@ if (
 
 function configurePushgateway() {
   // Configure the pushgateway.
-  const gateway = new client.Pushgateway(config.PUSH_GATEWAY_URL);
+  const gateway = new client.Pushgateway(config.PUSH_GATEWAY_URL, {
+    headers: { TTL: '10' },
+  });
 
   // Parse the ROOT_URL because we want the hostname.
   const rootURL = new URL(ROOT_URL);
