@@ -180,6 +180,9 @@ module.exports = {
           name: null,
           operation: null,
         });
+        if (!name || !operation) {
+          return;
+        }
 
         // Increment the graph query value, tagging with the name of the query.
         executedGraphQueriesTotalCounter.labels(operation, name).inc();
