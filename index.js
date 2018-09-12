@@ -43,11 +43,11 @@ function configurePushgateway() {
           installation_domain: rootURL.hostname,
         },
       },
-      (err, res, body) => {
+      err => {
         if (err) {
           console.error('error pushing to gateway', err);
         } else {
-          debug(`pushed metrics ${JSON.stringify(body, null, 2)}`);
+          debug(`pushed metrics`);
         }
       }
     );
@@ -129,7 +129,7 @@ module.exports = {
 
     // Attach the GraphQL Operation Name to the parent context, in this case,
     // the request object.
-    ctx.parent.parent.graphql = {
+    ctx.rootParent.graphql = {
       name,
       operation,
     };
