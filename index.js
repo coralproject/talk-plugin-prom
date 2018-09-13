@@ -5,6 +5,7 @@ const onFinished = require('on-finished');
 const client = require('prom-client');
 const debug = require('debug')('talk-plugin-prom');
 const { get } = require('lodash');
+const uuid = require('uuid/v1');
 
 // Load the global Talk configuration, we want to grab some variables..
 const { ROOT_URL } = require('config');
@@ -97,13 +98,35 @@ const graphQLExecutionTimingsHistogram = new client.Histogram({
 // Configure the prom client to send default metrics.
 client.collectDefaultMetrics({ prefix: 'talk_' });
 
+// Store all the connection ID's in this map, this way we can ensure we aren't
+// duplicating the same metric over and over again.
+const connections = new Map();
+
 module.exports = {
   websockets: {
-    onConnect: () => {
-      connectedWebsocketsTotalGauge.inc();
+    onConnect: (connectionParams, connection) => {
+      // Assign an ID to the connection if it doesn't have one already.
+      let id = get(connection, 'upgradeReq.id');
+      if (!id) {
+        id = uuid();
+        connection.upgradeReq.id = id;
+      }
+
+      // Increment the connected websocket connections if we haven't seen this
+      // connection before.
+      if (!connections.has(id)) {
+        connections.set(id, Date.now());
+        connectedWebsocketsTotalGauge.inc();
+      }
     },
-    onDisconnect: () => {
-      connectedWebsocketsTotalGauge.dec();
+    onDisconnect: connection => {
+      // Grab the ID, and decrement the gauge if we haven't seen this before.
+      const id = get(connection, 'upgradeReq.id');
+      if (id && connections.has(id)) {
+        // TODO: record the websocket session length?
+        connections.delete(id);
+        connectedWebsocketsTotalGauge.dec();
+      }
     },
   },
 
