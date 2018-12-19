@@ -1,4 +1,5 @@
 const os = require('os');
+const cluster = require('cluster');
 const ms = require('ms');
 const { URL } = require('url');
 const onFinished = require('on-finished');
@@ -34,13 +35,17 @@ function configurePushgateway() {
   // Parse the ROOT_URL because we want the hostname.
   const rootURL = new URL(ROOT_URL);
 
+  // Grab the hostname that we'll use to key this instance.
+  const instance =
+    os.hostname() + cluster.worker ? `#worker.${cluster.worker.id}` : '';
+
   // Configure pushing to the gateway at a predefined interval.
   setInterval(() => {
     gateway.push(
       {
         jobName: config.PUSH_JOB_NAME,
         groupings: {
-          instance: os.hostname(),
+          instance,
           installation_domain: rootURL.hostname,
         },
       },
