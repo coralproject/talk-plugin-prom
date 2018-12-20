@@ -36,8 +36,9 @@ function configurePushgateway() {
   const rootURL = new URL(ROOT_URL);
 
   // Grab the hostname that we'll use to key this instance.
-  const instance =
-    os.hostname() + cluster.worker ? `#worker.${cluster.worker.id}` : '';
+  const instance = cluster.worker
+    ? `${os.hostname()}#worker.${cluster.worker.id}`
+    : os.hostname();
 
   // Configure pushing to the gateway at a predefined interval.
   setInterval(() => {
