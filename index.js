@@ -21,9 +21,7 @@ if (
   !config.PUSH_GATEWAY_URL &&
   !config.METRICS_MOUNT_PATH
 ) {
-  throw new Error(
-    'must specify at least one of PROM_METRICS_MOUNT_PATH PROM_PUSH_GATEWAY_URL'
-  );
+  console.error('talk-plugin-prom is not properly configured, no metrics will be pushed')
 }
 
 function configurePushgateway() {
