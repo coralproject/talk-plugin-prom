@@ -5,7 +5,7 @@
   "author": "Wyatt Johnson <wyattjoh@gmail.com>",
   "license": "Apache-2.0",
   "dependencies": {
-    "debug": "^3.1.0",
+    "debug": "^3.2.7",
     "lodash": "^4.17.10",
     "ms": "^2.1.1",
     "on-finished": "^2.3.0",
